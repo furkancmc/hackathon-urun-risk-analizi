@@ -62,8 +62,8 @@ Bu proje, e-ticaret satıcıları için yapay zeka destekli risk analizi ve sat�
 
 ### 1. Projeyi Klonlayın
 ```bash
-git clone https://github.com/kullanici/hackathon-scraping.git
-cd hackathon-scraping
+git clone https://github.com/furkancmc/HACKATHON-AI-URUN-RISK-ANALIZI.git
+cd hackathon
 ```
 
 ### 2. Backend Kurulumu
@@ -252,11 +252,6 @@ npm test
 
 ## 📊 Performans
 
-### Önerilen Sistem Kaynakları
-- **CPU**: 4+ çekirdek
-- **RAM**: 16GB
-- **Disk**: SSD 50GB+
-- **Network**: 100Mbps+
 
 ### Optimizasyon İpuçları
 - Embedding'leri önceden oluşturun
@@ -314,21 +309,19 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 
 ## 👥 Geliştiriciler
 
-- **Ana Geliştirici**: [Adınız]
-- **AI Entegrasyonu**: [Adınız]
-- **Frontend**: [Adınız]
-- **Backend**: [Adınız]
+- **Ana Geliştiriciler**: [FURKAN CAMCIOĞLU VE MUHAMMED AKAY]
+- **Frontend**: [MUHAMMED AKAY]
+- **Backend**: [FURKAN CAMCIOĞLU]
 
 ## 📞 İletişim
 
-- **Email**: [email@example.com]
-- **GitHub**: [github.com/kullanici]
-- **LinkedIn**: [linkedin.com/in/kullanici]
+- **Email**: [furkancamcioglu@outlook.com.tr]
+- **GitHub**: [github.com/furkancmc]
+- **LinkedIn**: [https://www.linkedin.com/in/furkan-camcıoğlu-972a22378] ve [https://www.linkedin.com/in/muhammed-akay-aa21b7331]
 
 ## 🙏 Teşekkürler
 
 - Google Gemini AI ekibine
-- Ant Design topluluğuna
 - PostgreSQL ve pgvector geliştiricilerine
 - Tüm katkıda bulunanlara
 

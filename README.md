@@ -190,28 +190,28 @@ Content-Type: application/json
 ## 🗂️ Proje Yapısı
 
 ```
-hackathon-scraping/
+HACKATHON-AI-URUN-RISK-ANALIZI/
+├── .github/                         # GitHub workflows
 ├── backend/
-│   ├── app.py                 # Flask uygulaması
-│   └── requirements.txt       # Python gereksinimleri
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/        # React bileşenleri
-│   │   ├── pages/            # Sayfa bileşenleri
-│   │   ├── services/         # API servisleri
-│   │   └── App.js           # Ana uygulama
-│   └── package.json
-├── rag_service.py            # RAG servisi
-├── gemini_service.py         # AI servisi
-├── embedding_service.py      # Embedding servisi
-├── create_embeddings.py      # Embedding oluşturma
-├── setup_pgvector.py         # Veritabanı kurulumu
-├── requirements.txt          # Ana gereksinimler
-├── start_system.bat          # Windows başlatma
-├── start_system.sh           # Linux başlatma
-├── start_system.ps1          # PowerShell başlatma
-└── README.md
+│   ├── app.py                      # Flask uygulaması
+│   └── requirements.txt           # Backend bağımlılıkları
+├── frontend/                       # React frontend (iç yapısı burada gizlenmiş)
+├── .env                            # Ortam değişkenleri (gitignore içinde)
+├── .gitignore                      # Yoksayılacak dosyalar
+├── Dockerfile                      # Docker yapılandırması
+├── LICENSE                         # MIT Lisansı
+├── README.md                       # Proje tanıtımı
+├── create_missing_embeddings.py    # Eksik embedding üretici
+├── db_config.txt                   # Veritabanı yapılandırması (örnek)
+├── docker-compose.yml              # Docker çoklu servis tanımı
+├── embedding_service.py            # Embedding işlemleri
+├── gemini_service.py               # Google Gemini API entegrasyonu
+├── main_app.py                     # Ana başlatıcı Python modülü
+├── rag_service.py                  # RAG (retrieval-augmented generation) servisi
+├── requirements.txt                # Ortak Python bağımlılıkları
+├── setup_pgvector.py               # pgvector kurulum scripti
+└── test_system.py                  # Sistem testi
+
 ```
 
 ## 🔧 Konfigürasyon

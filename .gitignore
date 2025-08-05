@@ -1,189 +1,86 @@
-# Python
+# === PYTHON ===
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
 *.egg
-MANIFEST
+*.egg-info/
+dist/
+build/
+.eggs/
+*.manifest
+*.spec
 
-# Virtual Environment
+# === VIRTUAL ENVIRONMENTS ===
 .venv/
 venv/
 ENV/
 env/
 
-# Node.js
+# === JUPYTER ===
+.ipynb_checkpoints/
+
+# === LOG FILES ===
+*.log
+logs/
+
+# === OS & TEMP ===
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# === IDE CONFIGS ===
+.vscode/
+.idea/
+
+# === ENV VARIABLES & SECRETS ===
+.env
+.env.*
+*.key
+secrets.json
+api_keys.txt
+config.json
+db_config.txt
+
+# === NODE / REACT ===
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-
-# React
 build/
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Logs
-*.log
-logs/
-
-# Database
-*.db
+# === DATABASE FILES ===
 *.sqlite
 *.sqlite3
+*.db
 
-# Environment variables
-.env
-.env.local
-.env.production
-
-# Large data files
-*.json
-!package.json
-!package-lock.json
-!tsconfig.json
-!jsconfig.json
-
-# Temporary files
-*.tmp
-*.temp
-temp/
-tmp/
-
-# Backup files
-*.bak
-*.backup
-
-# API Keys and Secrets
-secrets.json
-config.json
-api_keys.txt
-
-# Database config
-db_config.txt
-.env
-
-# Large JSON data files (keep only small ones)
+# === LARGE JSON (kendi verileriniz) ===
 kulaklık_sonnnn.json
 klima_detayli_analiz.json
 telephone_sonnnn.json
 computer_sonnnn.json
 
-# Cache
-.cache/
-cache/
-
-# Coverage reports
-htmlcov/
-.coverage
-.coverage.*
-coverage.xml
+# === COVERAGE ===
+coverage/
 *.cover
-.hypothesis/
+*.coverage
+*.coverage.*
+htmlcov/
 .pytest_cache/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# PEP 582
-__pypackages__/
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
+.hypothesis/
 .mypy_cache/
-.dmypy.json
-dmypy.json
 
-# Pyre type checker
-.pyre/
+# === CONTAINERS ===
+*.pid
+celerybeat-schedule
 
-# PyCharm
+# === PYCHARM ===
 .idea/
 
-# VS Code
+# === VS CODE ===
 .vscode/
-
-# Windows
-*.lnk
-
-# macOS
-.AppleDouble
-.LSOverride
-
-# Icon must end with two \r
-Icon
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk 

@@ -206,7 +206,6 @@ HACKATHON-AI-URUN-RISK-ANALIZI/
 ├── docker-compose.yml              # Docker çoklu servis tanımı
 ├── embedding_service.py            # Embedding işlemleri
 ├── gemini_service.py               # Google Gemini API entegrasyonu
-├── main_app.py                     # Ana başlatıcı Python modülü
 ├── rag_service.py                  # RAG (retrieval-augmented generation) servisi
 ├── requirements.txt                # Ortak Python bağımlılıkları
 ├── setup_pgvector.py               # pgvector kurulum scripti

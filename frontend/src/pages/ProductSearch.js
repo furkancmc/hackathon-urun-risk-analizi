@@ -39,6 +39,7 @@ const ProductSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [detailModal, setDetailModal] = useState({ visible: false, product: null });
   const [analysisModal, setAnalysisModal] = useState({ visible: false, product: null, analysis: null });
+  const [brandsLoading, setBrandsLoading] = useState(false);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [brands, setBrands] = useState([]);
 
@@ -116,6 +117,7 @@ const ProductSearch = () => {
   // Markaları yükle
   const loadBrands = async () => {
     try {
+      setBrandsLoading(true);
       const response = await apiService.getBrands();
       if (response.data.success) {
         setBrands(response.data.data);

@@ -312,6 +312,9 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 - **Frontend**: [MUHAMMED AKAY]
 - **Backend**: [FURKAN CAMCIOĞLU]
 
+## Proje Videosu
+-**Youtube Videosu**:[https://youtu.be/BdR86g4vPOw]
+
 ## 📞 İletişim
 
 - **Email**: [furkancamcioglu@outlook.com.tr]

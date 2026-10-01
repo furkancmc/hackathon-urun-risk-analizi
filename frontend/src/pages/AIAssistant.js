@@ -1,229 +1,132 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Card, 
-  Input, 
-  Button, 
-  message, 
-  Space, 
-  Avatar,
-  Divider
-} from 'antd';
-import { 
-  SendOutlined, 
-  RobotOutlined, 
-  UserOutlined,
-  ClearOutlined
-} from '@ant-design/icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { Avatar, Button, Card, Divider, Input, message, Space } from 'antd';
+import { ClearOutlined, RobotOutlined, SendOutlined, UserOutlined } from '@ant-design/icons';
 import { apiService } from '../services/api';
 
 const { TextArea } = Input;
 
+const WELCOME_MESSAGE = {
+  role: 'assistant',
+  content:
+    'Merhaba, ben satış danışmanınızım. Ürün risk analizi, fiyatlandırma, rekabet durumu, kârlılık ' +
+    've müşteri yorumlarına göre iyileştirme konularında veritabanındaki ürünleri kullanarak öneriler ' +
+    'sunabilirim. Hangi ürünü satmayı düşünüyorsunuz?',
+};
+
+const EXAMPLE_QUESTIONS = [
+  'Samsung klima satmayı düşünüyorum, ne önerirsin?',
+  'Hangi kulaklık modellerinde kâr marjı daha yüksek?',
+  'Oyun bilgisayarı satarken rakiplerimden nasıl ayrışırım?',
+  'Müşteri yorumlarına göre telefonlarda nelere dikkat etmeliyim?',
+  'Stok yönetimi için hangi ürünlere odaklanmalıyım?',
+];
+
+const ChatMessage = ({ role, content }) => (
+  <div className={`chat-message ${role}`}>
+    <div className="chat-message-row">
+      <Avatar
+        icon={role === 'user' ? <UserOutlined /> : <RobotOutlined />}
+        style={{ backgroundColor: role === 'user' ? '#1890ff' : '#52c41a', flexShrink: 0 }}
+      />
+      <div className="chat-message-content">{content}</div>
+    </div>
+  </div>
+);
+
 const AIAssistant = () => {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Merhaba! 👋 Ben sizin satıcı koçunuzum. Ürün risk analizleri, satış stratejileri, fiyatlandırma önerileri, rekabet durumu ve karlılık değerlendirmesi konularında size özel tavsiyeler verebilirim. Hangi ürünü satmayı düşünüyorsunuz veya mevcut satışlarınızı nasıl artırabiliriz?'
-    }
-  ]);
+  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
 
-  const handleSendMessage = async () => {
-    if (!currentMessage.trim()) {
+  const sendMessage = async () => {
+    const text = currentMessage.trim();
+    if (!text) {
       message.warning('Lütfen bir mesaj yazın');
       return;
     }
 
-    const userMessage = currentMessage.trim();
     setCurrentMessage('');
-    
-    // Kullanıcı mesajını ekle
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setMessages((prev) => [...prev, { role: 'user', content: text }]);
     setLoading(true);
 
     try {
-      const response = await apiService.chatWithAI(userMessage);
-      
-      if (response.data.success) {
-        // AI yanıtını ekle
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: response.data.data.response 
-        }]);
-        
-        if (response.data.data.context_products > 0) {
-          message.success(`${response.data.data.context_products} ilgili ürün bulundu ve analiz edildi`);
-        }
-      } else {
-        message.error('AI yanıtı alınamadı');
+      const response = await apiService.chatWithAI(text);
+      const { response: answer, context_products: contextProducts } = response.data.data;
+      setMessages((prev) => [...prev, { role: 'assistant', content: answer }]);
+      if (contextProducts > 0) {
+        message.info(`Yanıt ${contextProducts} ilgili ürünün verisi kullanılarak oluşturuldu`);
       }
     } catch (error) {
-      message.error(`AI hatası: ${error.message}`);
-      
-      // Hata mesajını ekle
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: `❌ Üzgünüm, bir hata oluştu: ${error.message}` 
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: `Yanıt oluşturulamadı: ${error.message}` },
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
     }
   };
 
   const clearChat = () => {
-    setMessages([
-      {
-        role: 'assistant',
-        content: 'Merhaba! 👋 Ben sizin satıcı koçunuzum. Ürün risk analizleri, satış stratejileri, fiyatlandırma önerileri, rekabet durumu ve karlılık değerlendirmesi konularında size özel tavsiyeler verebilirim. Hangi ürünü satmayı düşünüyorsunuz veya mevcut satışlarınızı nasıl artırabiliriz?'
-      }
-    ]);
+    setMessages([WELCOME_MESSAGE]);
     message.info('Sohbet geçmişi temizlendi');
   };
 
-  const exampleQuestions = [
-    "Samsung klima satacağım, ne önerirsin?",
-    "Hangi ürünlerde daha yüksek kâr marjı var?",
-    "Fiyatlandırma stratejimi nasıl optimize edebilirim?",
-    "Rekabetçi avantajımı nasıl artırabilirim?",
-    "Stok yönetimi için hangi ürünlere odaklanmalıyım?"
-  ];
-
-  const handleExampleClick = (question) => {
-    setCurrentMessage(question);
-  };
-
   return (
-    <div>
-      <Card 
-        title="🤖 AI Satış Danışmanı"
-        extra={
-          <Button 
-            icon={<ClearOutlined />} 
-            onClick={clearChat}
-            type="text"
-          >
-            Temizle
+    <Card
+      title="AI Satış Danışmanı"
+      extra={<Button icon={<ClearOutlined />} onClick={clearChat} type="text">Temizle</Button>}
+    >
+      <p>
+        Sorularınız, veritabanındaki en ilgili ürünler bulunarak bu ürünlerin verileriyle birlikte
+        yapay zekaya iletilir. Böylece yanıtlar genel tavsiyeler yerine gerçek ürün verisine dayanır.
+      </p>
+
+      <div className="chat-container">
+        {messages.map((item, index) => (
+          <ChatMessage key={index} role={item.role} content={item.content} />
+        ))}
+        {loading && <ChatMessage role="assistant" content="Yanıt hazırlanıyor..." />}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <Space.Compact style={{ width: '100%', marginTop: 16 }}>
+        <TextArea
+          value={currentMessage}
+          onChange={(event) => setCurrentMessage(event.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Sorunuzu yazın (Enter ile gönder, Shift+Enter ile yeni satır)"
+          autoSize={{ minRows: 2, maxRows: 4 }}
+          disabled={loading}
+        />
+        <Button type="primary" icon={<SendOutlined />} onClick={sendMessage} loading={loading}
+          style={{ height: 'auto' }}>
+          Gönder
+        </Button>
+      </Space.Compact>
+
+      <Divider />
+
+      <h4>Örnek Sorular</h4>
+      <Space wrap>
+        {EXAMPLE_QUESTIONS.map((question) => (
+          <Button key={question} size="small" onClick={() => setCurrentMessage(question)} disabled={loading}>
+            {question}
           </Button>
-        }
-      >
-        <div style={{ marginBottom: 16 }}>
-          <p><strong>Satıcı odaklı AI danışmanınız size yardımcı olmaya hazır!</strong></p>
-          <p>Ürünler hakkında risk analizi, satış stratejileri, fiyatlandırma önerileri ve rekabet analizi yapabilirsiniz.</p>
-          
-          <div style={{ marginTop: 16 }}>
-            <strong>Örnek Sorular:</strong>
-            <ul>
-              <li>"Bu ürünü satmak riskli mi?"</li>
-              <li>"Hangi ürünler daha karlı?"</li>
-              <li>"Fiyat stratejim nasıl olmalı?"</li>
-              <li>"Rekabet durumu nasıl?"</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Chat Container */}
-        <div className="chat-container">
-          {messages.map((message, index) => (
-            <div key={index} className={`chat-message ${message.role}`}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                <Avatar 
-                  icon={message.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
-                  style={{ 
-                    backgroundColor: message.role === 'user' ? '#1890ff' : '#52c41a',
-                    flexShrink: 0
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    whiteSpace: 'pre-wrap', 
-                    lineHeight: '1.6',
-                    fontSize: '14px'
-                  }}>
-                    {message.content}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {loading && (
-            <div className="chat-message assistant">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                <Avatar 
-                  icon={<RobotOutlined />}
-                  style={{ backgroundColor: '#52c41a' }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div style={{ color: '#666' }}>
-                    🤖 Düşünüyorum...
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div style={{ marginTop: 16 }}>
-          <Space.Compact style={{ width: '100%' }}>
-            <TextArea
-              value={currentMessage}
-              onChange={(e) => setCurrentMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Sorunuzu yazın... (Enter ile gönder, Shift+Enter ile yeni satır)"
-              autoSize={{ minRows: 2, maxRows: 4 }}
-              disabled={loading}
-            />
-            <Button
-              type="primary"
-              icon={<SendOutlined />}
-              onClick={handleSendMessage}
-              loading={loading}
-              style={{ height: 'auto' }}
-            >
-              Gönder
-            </Button>
-          </Space.Compact>
-        </div>
-
-        <Divider />
-
-        {/* Example Questions */}
-        <div>
-          <h4>💡 Satıcı İçin Örnek Sorular</h4>
-          <Space wrap>
-            {exampleQuestions.map((question, index) => (
-              <Button
-                key={index}
-                size="small"
-                onClick={() => handleExampleClick(question)}
-                disabled={loading}
-              >
-                {question}
-              </Button>
-            ))}
-          </Space>
-        </div>
-      </Card>
-    </div>
+        ))}
+      </Space>
+    </Card>
   );
 };
 

@@ -1,42 +1,49 @@
-import React, { useState } from 'react';
-import { 
-  Card, 
-  Row, 
-  Col, 
-  Button, 
-  message, 
-  Descriptions, 
-  Badge, 
-  Alert,
-  Modal,
-  Progress,
-  Divider
-} from 'antd';
-import { 
-  ReloadOutlined,
-  DatabaseOutlined,
-  BugOutlined,
-  RocketOutlined
-} from '@ant-design/icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, Badge, Button, Card, Col, Descriptions, Divider, message, Modal, Progress, Row } from 'antd';
+import { BugOutlined, DatabaseOutlined, ReloadOutlined } from '@ant-design/icons';
 import { apiService } from '../services/api';
+import { formatTableName } from '../utils/format';
+
+const SERVICE_LABELS = {
+  rag_service: 'Arama (RAG) Servisi',
+  gemini_service: 'Gemini AI',
+  embedding_indexer: 'Embedding İndeksleyici',
+};
+
+const StatusBadge = ({ status }) => {
+  if (status === true || status === 'ok') return <Badge status="success" text="Çalışıyor" />;
+  if (status === 'error') return <Badge status="error" text="Hata" />;
+  return <Badge status="default" text="Kullanılamıyor" />;
+};
 
 const SystemManagement = ({ systemHealth, onHealthUpdate }) => {
   const [testing, setTesting] = useState(false);
   const [testResults, setTestResults] = useState(null);
-  const [embeddingLoading, setEmbeddingLoading] = useState(false);
+  const [indexing, setIndexing] = useState(false);
+  const [coverage, setCoverage] = useState(null);
+
+  const loadCoverage = useCallback(async () => {
+    try {
+      const response = await apiService.getTableStats();
+      const stats = response.data.data;
+      const products = stats.reduce((sum, t) => sum + t.total_products, 0);
+      const embeddings = stats.reduce((sum, t) => sum + t.embeddings_count, 0);
+      setCoverage({ products, embeddings, percent: products ? Math.round((embeddings / products) * 100) : 0 });
+    } catch {
+      setCoverage(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCoverage();
+  }, [loadCoverage]);
 
   const runSystemTests = async () => {
     setTesting(true);
-    
     try {
       const response = await apiService.testServices();
-      
-      if (response.data.success) {
-        setTestResults(response.data.data);
-        message.success('Sistem testleri tamamlandı');
-      } else {
-        message.error('Sistem testleri başarısız');
-      }
+      setTestResults(response.data.data);
+      message.success('Sistem testleri tamamlandı');
     } catch (error) {
       message.error(`Test hatası: ${error.message}`);
     } finally {
@@ -44,295 +51,131 @@ const SystemManagement = ({ systemHealth, onHealthUpdate }) => {
     }
   };
 
-  const createEmbeddings = async () => {
+  const refresh = () => {
+    onHealthUpdate();
+    loadCoverage();
+  };
+
+  const createEmbeddings = () => {
     Modal.confirm({
       title: 'Embedding Oluşturma',
-      content: 'Bu işlem uzun sürebilir. Eksik embedding\'leri oluşturmak istediğinizden emin misiniz?',
-      okText: 'Evet, Başlat',
+      content: 'Embedding tablosunda bulunmayan ürünler vektörleştirilecek. İşlem arka planda çalışır ve '
+        + 'veri miktarına göre uzun sürebilir. Devam edilsin mi?',
+      okText: 'Başlat',
       cancelText: 'İptal',
       onOk: async () => {
-        setEmbeddingLoading(true);
-        
+        setIndexing(true);
         try {
           const response = await apiService.createEmbeddings();
-          
-          if (response.data.success) {
-            message.success('Embedding oluşturma işlemi başlatıldı');
-            
-            // Sistem durumunu güncelle
-            setTimeout(() => {
-              onHealthUpdate();
-            }, 2000);
-          } else {
-            message.error('Embedding oluşturma başarısız');
-          }
+          message.success(response.data.message);
+          setTimeout(refresh, 2000);
         } catch (error) {
-          message.error(`Embedding hatası: ${error.message}`);
+          message.error(`Embedding oluşturulamadı: ${error.message}`);
         } finally {
-          setEmbeddingLoading(false);
+          setIndexing(false);
         }
-      }
+      },
     });
-  };
-
-  const clearCache = () => {
-    message.success('✅ Cache temizlendi!');
-    // React'te cache temizleme genelde sayfa yenileme ile olur
-    window.location.reload();
-  };
-
-  const getStatusBadge = (status) => {
-    if (status === true || status === 'ok') {
-      return <Badge status="success" text="Çalışıyor" />;
-    } else if (status === 'error') {
-      return <Badge status="error" text="Hata" />;
-    } else {
-      return <Badge status="default" text="Mevcut Değil" />;
-    }
-  };
-
-  const getServiceHealth = (service) => {
-    if (!testResults) return 'unknown';
-    
-    const serviceData = testResults[service];
-    if (!serviceData) return 'unknown';
-    
-    return serviceData.status;
   };
 
   return (
     <div>
-      <h2>⚙️ Sistem Yönetimi</h2>
-      
+      <h2>Sistem Yönetimi</h2>
+
       <Row gutter={[16, 16]}>
-        {/* Sistem Durumu */}
-        <Col span={12}>
-          <Card title="🔧 Sistem Durumu">
+        <Col xs={24} lg={12}>
+          <Card title="Servis Durumu" style={{ height: '100%' }}>
             {systemHealth ? (
               <Descriptions column={1} size="small">
                 <Descriptions.Item label="Genel Durum">
-                  {systemHealth.status === 'healthy' ? (
-                    <Badge status="success" text="Sağlıklı" />
-                  ) : (
-                    <Badge status="error" text="Sorunlu" />
-                  )}
+                  {systemHealth.status === 'healthy'
+                    ? <Badge status="success" text="Sağlıklı" />
+                    : <Badge status="warning" text="Kısmi hizmet" />}
                 </Descriptions.Item>
-                
-                <Descriptions.Item label="RAG Servisi">
-                  {getStatusBadge(systemHealth.services.rag_service)}
-                </Descriptions.Item>
-                
-                <Descriptions.Item label="Gemini AI">
-                  {getStatusBadge(systemHealth.services.gemini_service)}
-                </Descriptions.Item>
-                
-                <Descriptions.Item label="Embedding Creator">
-                  {getStatusBadge(systemHealth.services.embedding_creator)}
-                </Descriptions.Item>
+                {Object.entries(SERVICE_LABELS).map(([key, label]) => (
+                  <Descriptions.Item key={key} label={label}>
+                    <StatusBadge status={systemHealth.services[key]} />
+                  </Descriptions.Item>
+                ))}
+                {systemHealth.indexing && (
+                  <Descriptions.Item label="İndeksleme">
+                    <Badge status="processing" text="Devam ediyor" />
+                  </Descriptions.Item>
+                )}
               </Descriptions>
             ) : (
-              <Alert
-                message="Sistem durumu yüklenemedi"
-                description="Backend bağlantısını kontrol edin"
-                type="error"
-                showIcon
-              />
+              <Alert message="Servis durumu alınamadı" description="Backend bağlantısını kontrol edin."
+                type="error" showIcon />
             )}
 
             <Divider />
 
-            <Button
-              type="primary"
-              icon={<BugOutlined />}
-              onClick={runSystemTests}
-              loading={testing}
-              style={{ width: '100%', marginBottom: 8 }}
-            >
-              🧪 Sistem Testlerini Çalıştır
+            <Button type="primary" icon={<BugOutlined />} onClick={runSystemTests} loading={testing} block
+              style={{ marginBottom: 8 }}>
+              Sistem Testlerini Çalıştır
             </Button>
-
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={onHealthUpdate}
-              style={{ width: '100%' }}
-            >
-              🔄 Durumu Yenile
+            <Button icon={<ReloadOutlined />} onClick={refresh} block>
+              Durumu Yenile
             </Button>
           </Card>
         </Col>
 
-        {/* Performans Metrikleri */}
-        <Col span={12}>
-          <Card title="📊 Performans Metrikleri">
+        <Col xs={24} lg={12}>
+          <Card title="Test Sonuçları" style={{ height: '100%' }}>
             {testResults ? (
-              <div>
-                <h4>Test Sonuçları:</h4>
-                
-                {/* RAG Service */}
-                <div style={{ marginBottom: 16 }}>
-                  <strong>RAG Servisi:</strong> {getStatusBadge(getServiceHealth('rag_service'))}
-                  {testResults.rag_service?.tables && (
-                    <div style={{ marginTop: 4, fontSize: '12px', color: '#666' }}>
-                      {testResults.rag_service.tables} tablo aktif
-                    </div>
-                  )}
-                </div>
-
-                {/* Gemini Service */}
-                <div style={{ marginBottom: 16 }}>
-                  <strong>Gemini AI:</strong> {getStatusBadge(getServiceHealth('gemini_service'))}
-                  {testResults.gemini_service?.response_length && (
-                    <div style={{ marginTop: 4, fontSize: '12px', color: '#666' }}>
-                      Yanıt uzunluğu: {testResults.gemini_service.response_length} karakter
-                    </div>
-                  )}
-                </div>
-
-                {/* Tablolar */}
-                {testResults.rag_service?.table_names && (
-                  <div>
-                    <strong>Aktif Tablolar:</strong>
-                    <ul style={{ fontSize: '12px', marginTop: 4 }}>
-                      {testResults.rag_service.table_names.map((table, index) => (
-                        <li key={index}>{table.replace('_embeddings', '').replace('_', ' ').toUpperCase()}</li>
-                      ))}
-                    </ul>
-                  </div>
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label={SERVICE_LABELS.rag_service}>
+                  <StatusBadge status={testResults.rag_service?.status} />
+                  {testResults.rag_service?.tables !== undefined && ` (${testResults.rag_service.tables} tablo)`}
+                </Descriptions.Item>
+                <Descriptions.Item label={SERVICE_LABELS.gemini_service}>
+                  <StatusBadge status={testResults.gemini_service?.status} />
+                </Descriptions.Item>
+                {testResults.rag_service?.table_names?.length > 0 && (
+                  <Descriptions.Item label="Embedding Tabloları">
+                    {testResults.rag_service.table_names.map(formatTableName).join(', ')}
+                  </Descriptions.Item>
                 )}
-              </div>
+              </Descriptions>
             ) : (
-              <Alert
-                message="Test sonuçları mevcut değil"
-                description="Sistem testlerini çalıştırın"
-                type="info"
-                showIcon
-              />
+              <Alert message="Henüz test çalıştırılmadı" type="info" showIcon />
             )}
 
             <Divider />
 
-            <Button
-              type="default"
-              icon={<DatabaseOutlined />}
-              onClick={createEmbeddings}
-              loading={embeddingLoading}
-              style={{ width: '100%', marginBottom: 8 }}
-            >
-              🔨 Eksik Embedding'leri Oluştur
-            </Button>
-
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={clearCache}
-              style={{ width: '100%' }}
-            >
-              🧹 Cache Temizle
+            <Button icon={<DatabaseOutlined />} onClick={createEmbeddings} loading={indexing} block>
+              Eksik Embedding'leri Oluştur
             </Button>
           </Card>
         </Col>
       </Row>
 
-      {/* Sistem Sağlığı Göstergesi */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col span={8}>
-          <Card title="🎯 Embedding Verimliliği" style={{ textAlign: 'center' }}>
-            <Progress
-              type="circle"
-              percent={systemHealth?.services.rag_service ? 85 : 0}
-              format={(percent) => `${percent}%`}
-              status={systemHealth?.services.rag_service ? 'success' : 'exception'}
-            />
-            <p style={{ marginTop: 16 }}>
-              Sistem {systemHealth?.services.rag_service ? 'verimli' : 'sorunlu'}
-            </p>
+        <Col xs={24} md={12}>
+          <Card title="Embedding Kapsamı" style={{ textAlign: 'center' }}>
+            {coverage ? (
+              <>
+                <Progress type="circle" percent={coverage.percent} />
+                <p style={{ marginTop: 16 }}>
+                  {coverage.embeddings.toLocaleString('tr-TR')} / {coverage.products.toLocaleString('tr-TR')} ürün
+                </p>
+              </>
+            ) : (
+              <Alert message="Kapsam bilgisi alınamadı" type="warning" showIcon />
+            )}
           </Card>
         </Col>
-        
-        <Col span={8}>
-          <Card title="📊 Aktif Servisler" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', color: '#1890ff' }}>
-              {systemHealth ? Object.values(systemHealth.services).filter(Boolean).length : 0}/3
+        <Col xs={24} md={12}>
+          <Card title="Aktif Servisler" style={{ textAlign: 'center' }}>
+            <div className="big-number">
+              {systemHealth ? Object.values(systemHealth.services).filter(Boolean).length : 0}
+              {' / '}
+              {Object.keys(SERVICE_LABELS).length}
             </div>
-            <p>Servis aktif</p>
-          </Card>
-        </Col>
-        
-        <Col span={8}>
-          <Card title="🟢 Sistem Sağlığı" style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '2rem' }}>
-              {systemHealth?.status === 'healthy' ? '🟢 İyi' : '🔴 Sorunlu'}
-            </div>
-            <p>
-              {systemHealth?.status === 'healthy' 
-                ? 'Tüm sistemler çalışıyor' 
-                : 'Sistem kontrolü gerekli'
-              }
-            </p>
+            <p>Servis çalışıyor</p>
           </Card>
         </Col>
       </Row>
-
-      {/* Sistem Logları */}
-      <Card title="📝 Sistem Logları" style={{ marginTop: 16 }}>
-        <div style={{ 
-          background: '#f5f5f5', 
-          padding: '1rem', 
-          borderRadius: '4px',
-          fontFamily: 'monospace',
-          fontSize: '12px',
-          height: '200px',
-          overflowY: 'auto'
-        }}>
-          <div>[INFO] React frontend başlatıldı</div>
-          <div>[INFO] Backend API bağlantısı kuruldu</div>
-          {systemHealth?.services.rag_service && <div>[INFO] RAG servisi aktif</div>}
-          {systemHealth?.services.gemini_service && <div>[INFO] Gemini AI bağlantısı başarılı</div>}
-          {systemHealth?.services.embedding_creator && <div>[INFO] Embedding creator hazır</div>}
-          <div>[INFO] Dashboard yüklendi</div>
-          {testResults && <div>[INFO] Sistem testleri tamamlandı</div>}
-        </div>
-      </Card>
-
-      {/* Hızlı Aksiyonlar */}
-      <Card title="⚡ Hızlı Aksiyonlar" style={{ marginTop: 16 }}>
-        <Row gutter={[8, 8]}>
-          <Col span={6}>
-            <Button 
-              type="primary" 
-              icon={<RocketOutlined />}
-              onClick={() => window.open('http://localhost:5000/api/health', '_blank')}
-              style={{ width: '100%' }}
-            >
-              Backend Durumu
-            </Button>
-          </Col>
-          <Col span={6}>
-            <Button 
-              onClick={runSystemTests}
-              loading={testing}
-              style={{ width: '100%' }}
-            >
-              Hızlı Test
-            </Button>
-          </Col>
-          <Col span={6}>
-            <Button 
-              onClick={onHealthUpdate}
-              style={{ width: '100%' }}
-            >
-              Yenile
-            </Button>
-          </Col>
-          <Col span={6}>
-            <Button 
-              onClick={() => message.info('Sistem normal çalışıyor')}
-              style={{ width: '100%' }}
-            >
-              Durum Raporu
-            </Button>
-          </Col>
-        </Row>
-      </Card>
     </div>
   );
 };

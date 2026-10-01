@@ -1,26 +1,21 @@
-# Frontend Dockerfile
-FROM node:16-alpine
+FROM node:20-alpine AS build
 
-# Çalışma dizinini ayarla
 WORKDIR /app
 
-# Package dosyalarını kopyala
 COPY package*.json ./
+RUN npm ci
 
-# Bağımlılıkları yükle
-RUN npm ci --only=production
-
-# Uygulama dosyalarını kopyala
 COPY . .
 
-# Production build oluştur
+# Docker ortamında API isteklerini nginx üzerinden backend'e yönlendir.
+ARG REACT_APP_API_URL=/api
+ENV REACT_APP_API_URL=$REACT_APP_API_URL \
+    GENERATE_SOURCEMAP=false
 RUN npm run build
 
-# Nginx ile serve et
 FROM nginx:alpine
-COPY --from=0 /app/build /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"] 
+CMD ["nginx", "-g", "daemon off;"]

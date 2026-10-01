@@ -1,35 +1,37 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:15
-    container_name: ai_seller_postgres
+    image: pgvector/pgvector:pg16
     environment:
-      POSTGRES_DB: ai_seller_analysis
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: ${DB_NAME:-urun_risk_analiz}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD .env dosyasinda tanimlanmali}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./setup_pgvector.sql:/docker-entrypoint-initdb.d/setup_pgvector.sql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
   backend:
-    build: .
-    container_name: ai_seller_backend
+    build: ./backend
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
     ports:
       - "5000:5000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:your_password@postgres:5432/ai_seller_analysis
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
   frontend:
     build: ./frontend
-    container_name: ai_seller_frontend
     ports:
       - "3000:80"
     depends_on:
@@ -37,4 +39,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data: 
+  postgres_data:

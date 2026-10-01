@@ -1,332 +1,219 @@
-# 🤖 AI Destekli Satıcı Risk Analiz Sistemi
+# AI Destekli Satıcı Risk Analiz Sistemi
 
-Bu proje, e-ticaret satıcıları için yapay zeka destekli risk analizi ve satış stratejisi önerileri sunan kapsamlı bir web uygulamasıdır.
+[![CI](https://github.com/furkancmc/HACKATHON-AI-URUN-RISK-ANALIZI/actions/workflows/ci.yml/badge.svg)](https://github.com/furkancmc/HACKATHON-AI-URUN-RISK-ANALIZI/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB)
+![React](https://img.shields.io/badge/React-18-61DAFB)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-336791)
+![Gemini](https://img.shields.io/badge/Google-Gemini-4285F4)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## 🚀 Özellikler
+E-ticaret satıcılarının bir ürünü satmaya karar vermeden önce pazar rekabetini, fiyat
+konumunu ve müşteri memnuniyetini değerlendirmesini sağlayan, RAG (Retrieval-Augmented
+Generation) mimarisine dayalı bir karar destek sistemidir. **BTK Akademi Hackathon 2025**
+kapsamında geliştirilmiştir.
 
-### 📊 **Ürün Analizi**
-- Gelişmiş ürün arama ve filtreleme
-- Detaylı ürün bilgileri görüntüleme
-- Fiyat ve rating analizi
-- Marka bazlı kategorilendirme
+## Proje Videosu
 
-### 🤖 **AI Destekli Risk Analizi**
-- Ürün bazlı risk skorlaması
-- Satış potansiyeli değerlendirmesi
-- Rekabet analizi
-- Karlılık tahminleri
-- Pazar trend analizi
+[![Proje tanıtım videosu](https://img.youtube.com/vi/BdR86g4vPOw/hqdefault.jpg)](https://www.youtube.com/watch?v=BdR86g4vPOw)
 
-### 💬 **AI Sohbet Asistanı**
-- Satıcı odaklı soru-cevap
-- Strateji önerileri
-- Pazar analizi
-- Risk değerlendirmesi
+## Problem ve Çözüm
 
-### 📈 **Dashboard**
-- Sistem istatistikleri
-- Tablo durumları
-- Embedding kapsamı
-- Performans metrikleri
+Pazar yerlerinde yeni bir ürün satmaya başlayan satıcılar; rekabetin yoğunluğunu, doğru
+fiyat aralığını ve ürünün müşteri tarafından nasıl karşılandığını genellikle elle yaptıkları
+araştırmalarla tahmin etmeye çalışır. Bu süreç hem zaman alır hem de veriye dayanmaz.
 
-## 🛠️ Teknolojiler
+Bu proje, Trendyol'dan toplanan telefon, bilgisayar, klima ve kulaklık kategorilerindeki
+ürün verisini anlamsal arama ile erişilebilir hale getirir. Her ürün için kural tabanlı bir
+risk skoru hesaplar ve bu skoru ürünün tüm verisiyle birlikte Google Gemini'ye bağlam olarak
+vererek satıcıya özel, uygulanabilir bir analiz ve eylem planı üretir.
 
-### Backend
-- **Python 3.8+**
-- **Flask** - Web framework
-- **PostgreSQL** - Veritabanı
-- **pgvector** - Vektör veritabanı
-- **Google Gemini AI** - AI servisleri
-- **Sentence Transformers** - Embedding modeli
+## Özellikler
 
-### Frontend
-- **React 18**
-- **Ant Design** - UI framework
-- **Axios** - HTTP client
-- **Recharts** - Grafik kütüphanesi
+### Ürün Risk Arama
+- Satıcının doğal dille yazdığı sorguya ("sessiz çalışan inverter klima" gibi) anlamsal
+  olarak en yakın ürünleri tüm kategorilerde bulur.
+- Fiyat aralığı, minimum müşteri puanı ve marka filtreleri sunar.
+- Her sonuç için benzerlik oranı ve genel risk skoru gösterilir.
+- Ürün detay ekranında rekabet konumu, kârlılık, pazarlama ve müşteri stratejisi,
+  operasyon ve lojistik bilgileri ile SEO uyumlu anahtar kelimeler tematik kartlarda sunulur.
 
-## 📋 Gereksinimler
+### Detaylı Risk Analizi
+- Fiyat, müşteri puanı ve rekabet yoğunluğuna dayalı 0-10 aralığında risk skorları hesaplanır.
+- Gemini, skorları ve ürün verisini yorumlayarak satış potansiyeli, fiyatlandırma ve rekabet
+  stratejisi, kritik riskler, kârlılık ve pazarlama önerilerinden oluşan bir rapor üretir.
+- Rapor; **acil eylemler**, **bu ay yapılacaklar** ve **uzun vadeli stratejiler** olarak
+  gruplanmış yapılandırılmış bir eylem planıyla tamamlanır.
 
-### Sistem Gereksinimleri
-- Python 3.8 veya üzeri
-- Node.js 16 veya üzeri
-- PostgreSQL 13 veya üzeri
-- 8GB RAM (minimum)
-- 10GB disk alanı
+### Satış Dashboard
+- Kategori bazında ürün sayısı, ortalama fiyat ve ortalama puan.
+- Kategorilerin ürün dağılımı grafikleri ve embedding kapsama oranları.
+- Kategorilere göre en yüksek fiyatlı ürünler ve hızlı risk skorları.
 
-### API Gereksinimleri
-- Google Gemini API anahtarı
-- PostgreSQL veritabanı bağlantısı
+### AI Satış Danışmanı
+- Satıcı, aklındaki ürünü doğrudan sorar: ürünle nasıl fark yaratabileceği, müşteri
+  yorumlarına göre hangi noktalarda iyileştirme yapabileceği gibi.
+- Soruyla en ilgili ürünler veritabanından bulunur ve yanıt bu ürünlerin gerçek verisine
+  dayanarak üretilir.
 
-## 🚀 Kurulum
+## Mimari
 
-### 1. Projeyi Klonlayın
-```bash
-git clone https://github.com/furkancmc/HACKATHON-AI-URUN-RISK-ANALIZI.git
-cd hackathon
+```mermaid
+flowchart LR
+    U[React arayüzü] -->|REST| F[Flask API]
+    F --> R[RAG servisi]
+    R -->|kosinüs benzerliği| V[(pgvector<br/>embedding tabloları)]
+    R -->|ürün detayı| P[(PostgreSQL<br/>kategori tabloları)]
+    R --> S[Kural tabanlı<br/>risk skorlama]
+    F --> G[Gemini servisi]
+    G -->|risk raporu ve<br/>eylem planı| F
 ```
 
-### 2. Backend Kurulumu
-```bash
-# Sanal ortam oluşturun
-python -m venv .venv
+1. Ürün metinleri çok dilli bir Sentence Transformers modeliyle vektöre dönüştürülüp
+   pgvector'da saklanır.
+2. Satıcının sorgusu aynı modelle vektörleştirilir ve kosinüs benzerliği ile en yakın
+   ürünler bulunur.
+3. Bulunan ürünlerin tüm verisi ve risk skorları Gemini'ye bağlam olarak verilir.
+4. Gemini satıcıya yönelik rapor, yapılandırılmış eylem planı veya sohbet yanıtı üretir.
 
-# Sanal ortamı etkinleştirin
-# Windows:
-.venv\Scripts\activate
-# Linux/Mac:
-source .venv/bin/activate
+Veri hazırlama süreci, bileşenler ve risk formülleri için: [docs/architecture.md](docs/architecture.md)
 
-# Gereksinimleri yükleyin
-pip install -r requirements.txt
+## Teknolojiler
+
+| Katman | Teknoloji |
+|---|---|
+| Backend | Python 3.11, Flask, Gunicorn |
+| Veritabanı | PostgreSQL, pgvector (HNSW indeksli kosinüs araması) |
+| Embedding | Sentence Transformers (`paraphrase-multilingual-MiniLM-L12-v2`, 384 boyut) |
+| Üretken yapay zeka | Google Gemini (`google-genai` SDK, yapılandırılmış JSON çıktı) |
+| Frontend | React 18, Ant Design 5, Recharts, Axios |
+| Altyapı | Docker, Docker Compose, Nginx, GitHub Actions |
+| Test ve kalite | Pytest, Ruff |
+
+## Proje Yapısı
+
+```
+.
+├── backend/
+│   ├── app.py                    # Flask uygulama fabrikası ve giriş noktası
+│   ├── config.py                 # Ortam değişkenlerinden yapılandırma
+│   ├── db.py                     # Bağlantı yönetimi ve şema yardımcıları
+│   ├── routes.py                 # REST API endpoint'leri
+│   ├── serialization.py          # Veritabanı tiplerinin JSON dönüşümü
+│   ├── services/
+│   │   ├── rag_service.py        # Anlamsal arama, filtreleme, ürün ve dashboard verisi
+│   │   ├── risk_scoring.py       # Kural tabanlı risk skorlama
+│   │   ├── gemini_service.py     # Gemini entegrasyonu
+│   │   ├── prompts.py            # Sistem talimatları ve bağlam şablonları
+│   │   ├── embedding_service.py  # Metin vektörleştirme
+│   │   └── embedding_indexer.py  # Embedding tablolarının üretimi
+│   ├── scripts/
+│   │   └── create_embeddings.py  # Embedding üretimi için komut satırı aracı
+│   ├── tests/                    # Birim ve API testleri
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── pages/                # Arama, Dashboard, AI Danışman, Sistem Yönetimi
+│   │   ├── components/           # Ürün detay ve risk analizi modalları
+│   │   ├── services/api.js       # Backend API istemcisi
+│   │   ├── utils/                # Biçimlendirme ve analiz raporu ayrıştırma
+│   │   └── constants/            # Alan adlarının Türkçe karşılıkları
+│   ├── Dockerfile
+│   └── nginx.conf
+├── database/
+│   └── schema.sql                # Kategori tabloları ve pgvector kurulumu
+├── docs/
+│   ├── architecture.md           # Mimari ve risk skorlama yöntemi
+│   └── api.md                    # API referansı
+├── docker-compose.yml
+└── .env.example
 ```
 
-### 3. Frontend Kurulumu
+## API
+
+| Metot | Endpoint | Açıklama |
+|---|---|---|
+| GET | `/api/health` | Servis durumu |
+| POST | `/api/search` | Filtreli anlamsal ürün arama ve risk skorları |
+| GET | `/api/product/<id>/details` | Ürünün tüm verisi ve risk analizi |
+| POST | `/api/ai/analyze` | Gemini ile risk raporu ve eylem planı |
+| POST | `/api/ai/chat` | Ürün verisine dayalı satış danışmanı sohbeti |
+| GET | `/api/tables/stats` | Kategori istatistikleri |
+| GET | `/api/dashboard/sales-data` | Dashboard ürün listesi |
+| GET | `/api/brands` | Marka listesi |
+| POST | `/api/embeddings/create` | Eksik embedding'leri arka planda üretir |
+
+İstek ve yanıt örnekleri: [docs/api.md](docs/api.md)
+
+## Kurulum
+
+> Hackathon sırasında kullanılan ürün veri seti bu repoya dahil değildir. Veritabanı şeması
+> `database/schema.sql` dosyasında yer alır.
+
+### Docker ile
+
 ```bash
-cd frontend
-npm install
+cp .env.example .env          # DB_PASSWORD ve GEMINI_API_KEY değerlerini doldurun
+docker compose up --build
 ```
 
-### 4. Veritabanı Kurulumu
-```bash
-# PostgreSQL'de veritabanı oluşturun
-createdb ai_seller_analysis
+- Arayüz: http://localhost:3000
+- API: http://localhost:5000/api/health
 
-# pgvector uzantısını etkinleştirin
-psql -d ai_seller_analysis -c "CREATE EXTENSION IF NOT EXISTS vector;"
+Veritabanına ürün verisi yüklendikten sonra embedding'ler arayüzdeki **Sistem Yönetimi**
+sekmesinden veya aşağıdaki komutla üretilir:
+
+```bash
+docker compose exec backend python -m scripts.create_embeddings
 ```
 
-### 5. Ortam Değişkenleri
-`.env` dosyası oluşturun:
-```env
-# Database
-DATABASE_URL=postgresql://username:password@localhost:5432/ai_seller_analysis
+### Manuel
 
-# Google Gemini API
-GEMINI_API_KEY=your_gemini_api_key_here
+Gereksinimler: Python 3.11, Node.js 20, pgvector eklentili PostgreSQL 15+
 
-# Flask
-FLASK_ENV=development
-FLASK_DEBUG=True
-```
-
-## 🎯 Kullanım
-
-### Hızlı Başlatma
 ```bash
-# Windows
-start_system.bat
+# Veritabanı
+psql -U postgres -c "CREATE DATABASE urun_risk_analiz"
+psql -U postgres -d urun_risk_analiz -f database/schema.sql
 
-# Linux/Mac
-./start_system.sh
-
-# PowerShell
-.\start_system.ps1
-```
-
-### Manuel Başlatma
-```bash
-# Backend (Terminal 1)
+# Backend
+cp .env.example .env
 cd backend
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m scripts.create_embeddings
 python app.py
 
-# Frontend (Terminal 2)
+# Frontend (ayrı terminalde)
 cd frontend
+npm install
 npm start
 ```
 
-### Erişim
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **Health Check**: http://localhost:5000/api/health
+## Testler
 
-## 📖 API Dokümantasyonu
-
-### Temel Endpoint'ler
-
-#### Health Check
-```http
-GET /api/health
-```
-
-#### Ürün Arama
-```http
-POST /api/search
-Content-Type: application/json
-
-{
-  "query": "samsung telefon",
-  "filters": {
-    "price_range": [0, 5000],
-    "min_rating": 4.0,
-    "brands": ["Samsung"]
-  },
-  "limit": 10
-}
-```
-
-#### AI Analiz
-```http
-POST /api/ai/analyze
-Content-Type: application/json
-
-{
-  "product_id": "12345",
-  "source_table": "telephone_products",
-  "query": "Bu ürün için risk analizi yap"
-}
-```
-
-#### AI Sohbet
-```http
-POST /api/ai/chat
-Content-Type: application/json
-
-{
-  "message": "Samsung telefonları için satış stratejisi öner"
-}
-```
-
-## 🗂️ Proje Yapısı
-
-```
-HACKATHON-AI-URUN-RISK-ANALIZI/
-├── .github/                         # GitHub workflows
-├── backend/
-│   ├── app.py                      # Flask uygulaması
-│   └── requirements.txt           # Backend bağımlılıkları
-├── frontend/                       # React frontend (iç yapısı burada gizlenmiş)
-├── .env                            # Ortam değişkenleri (gitignore içinde)
-├── .gitignore                      # Yoksayılacak dosyalar
-├── Dockerfile                      # Docker yapılandırması
-├── LICENSE                         # MIT Lisansı
-├── README.md                       # Proje tanıtımı
-├── create_missing_embeddings.py    # Eksik embedding üretici
-├── db_config.txt                   # Veritabanı yapılandırması (örnek)
-├── docker-compose.yml              # Docker çoklu servis tanımı
-├── embedding_service.py            # Embedding işlemleri
-├── gemini_service.py               # Google Gemini API entegrasyonu
-├── rag_service.py                  # RAG (retrieval-augmented generation) servisi
-├── requirements.txt                # Ortak Python bağımlılıkları
-├── setup_pgvector.py               # pgvector kurulum scripti
-└── test_system.py                  # Sistem testi
-
-```
-
-## 🔧 Konfigürasyon
-
-### Veritabanı Ayarları
-`db_config.txt` dosyasında veritabanı bağlantı bilgilerini düzenleyin:
-```
-host=localhost
-port=5432
-database=ai_seller_analysis
-user=your_username
-password=your_password
-```
-
-### AI Model Ayarları
-`gemini_service.py` dosyasında AI model parametrelerini düzenleyin:
-- Model adı
-- Sıcaklık değeri
-- Token limiti
-
-## 🧪 Test
-
-### Sistem Testi
 ```bash
-python test_system.py
+cd backend
+pip install -r requirements-dev.txt
+ruff check .
+pytest
 ```
 
-### API Testi
-```bash
-curl http://localhost:5000/api/health
-```
+Testler veritabanı ve Gemini bağlantısı gerektirmez; servisler sahte nesnelerle (mock)
+değiştirilerek API davranışı, risk skorlama kuralları, embedding dokümanı oluşturma ve
+prompt bağlamı doğrulanır. Her push'ta GitHub Actions üzerinde lint, test, frontend build
+ve Docker imaj build adımları çalışır.
 
-### Frontend Testi
-```bash
-cd frontend
-npm test
-```
+## Ekip
 
-## 📊 Performans
+| İsim | Rol | Bağlantılar |
+|---|---|---|
+| Furkan Camcıoğlu | Backend, veri ve yapay zeka katmanı | [GitHub](https://github.com/furkancmc) · [LinkedIn](https://www.linkedin.com/in/furkan-camcıoğlu-972a22378) |
+| Muhammed Akay | Frontend | [LinkedIn](https://www.linkedin.com/in/muhammed-akay-aa21b7331) |
 
+İletişim: furkancamcioglu@outlook.com.tr
 
-### Optimizasyon İpuçları
-- Embedding'leri önceden oluşturun
-- Veritabanı indekslerini optimize edin
-- CDN kullanın (production)
-- Caching mekanizmaları ekleyin
+## Lisans
 
-## 🐛 Sorun Giderme
-
-### Yaygın Sorunlar
-
-#### Backend Bağlantı Hatası
-```bash
-# Sanal ortamı kontrol edin
-.venv\Scripts\activate
-
-# Gereksinimleri yeniden yükleyin
-pip install -r requirements.txt
-
-# Port kontrolü
-netstat -an | findstr :5000
-```
-
-#### Frontend Bağlantı Hatası
-```bash
-# Node modüllerini temizleyin
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
-
-# Port kontrolü
-netstat -an | findstr :3000
-```
-
-#### Veritabanı Bağlantı Hatası
-```bash
-# PostgreSQL servisini kontrol edin
-sudo systemctl status postgresql
-
-# Bağlantıyı test edin
-psql -h localhost -U username -d ai_seller_analysis
-```
-
-## 🤝 Katkıda Bulunma
-
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
-
-## 👥 Geliştiriciler
-
-- **Ana Geliştiriciler**: [FURKAN CAMCIOĞLU VE MUHAMMED AKAY]
-- **Frontend**: [MUHAMMED AKAY]
-- **Backend**: [FURKAN CAMCIOĞLU]
-
-## Proje Videosu
--**Youtube Videosu**:[https://youtu.be/BdR86g4vPOw]
-
-## 📞 İletişim
-
-- **Email**: [furkancamcioglu@outlook.com.tr]
-- **GitHub**: [github.com/furkancmc]
-- **LinkedIn**: [https://www.linkedin.com/in/furkan-camcıoğlu-972a22378] ve [https://www.linkedin.com/in/muhammed-akay-aa21b7331]
-
-## 🙏 Teşekkürler
-
-- Google Gemini AI ekibine
-- PostgreSQL ve pgvector geliştiricilerine
-- Tüm katkıda bulunanlara
-
----
-
-⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın! 
+Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.

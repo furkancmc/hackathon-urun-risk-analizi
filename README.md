@@ -1,6 +1,6 @@
 # AI Destekli Satıcı Risk Analiz Sistemi
 
-[![CI](https://github.com/furkancmc/HACKATHON-AI-URUN-RISK-ANALIZI/actions/workflows/ci.yml/badge.svg)](https://github.com/furkancmc/HACKATHON-AI-URUN-RISK-ANALIZI/actions/workflows/ci.yml)
+[![CI](https://github.com/furkancmc/hackathon-urun-risk-analizi/actions/workflows/ci.yml/badge.svg)](https://github.com/furkancmc/hackathon-urun-risk-analizi/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB)
 ![React](https://img.shields.io/badge/React-18-61DAFB)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pgvector-336791)
